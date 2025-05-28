@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "A configurable social authentication package for GitHub, Google, and Apple OAuth",
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "bun build src/index.ts --outdir=dist --target=bun --sourcemap --external=@octokit/oauth-app --external=@octokit/rest --external=googleapis",
+    "build": "tsup",
     "dev": "bun --watch src/index.ts",
     "test": "bun test",
     "test:watch": "bun test --watch",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "tsup": "^8.5.0",
     "typescript": "^5.0.0"
   },
   "peerDependencies": {
@@ -43,9 +45,9 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
   "files": [
