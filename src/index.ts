@@ -6,6 +6,7 @@ export { BaseSocialAuth } from "./base";
 export { GitHubAuth } from "./modules/github";
 export { GoogleAuth } from "./modules/google";
 export { AppleAuth } from "./modules/apple";
+export { FacebookAuth } from "./modules/facebook";
 
 // Type exports
 export type {

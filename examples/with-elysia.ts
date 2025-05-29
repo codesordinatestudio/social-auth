@@ -16,6 +16,12 @@ const googleAuth = SocialAuth.createGoogle({
   redirectUri: "http://localhost:3000/auth/callback/google",
 });
 
+const facebookAuth = SocialAuth.createFacebook({
+  providerId: process.env.FACEBOOK_CLIENT_ID!,
+  providerSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+  redirectUri: "http://localhost:3000/auth/callback/facebook",
+});
+
 app
   // Root route with login options
   .get("/", () => {
@@ -36,6 +42,7 @@ app
         <p>Choose a provider to authenticate with:</p>
         <a href="/auth/github" class="auth-button">Login with GitHub</a>
         <a href="/auth/google" class="auth-button">Login with Google</a>
+        <a href="/auth/facebook" class="auth-button">Login with Facebook</a>
       </body>
       </html>
     `,
@@ -110,6 +117,38 @@ app
     }
   })
 
+  // Facebook OAuth routes
+  .get("/auth/facebook", () => {
+    const authUrl = facebookAuth.getAuthUrl({
+      scopes: ["email", "public_profile"],
+      state: "random-state-string",
+    });
+    return Response.redirect(authUrl);
+  })
+
+  .get("/auth/callback/facebook", async ({ query }) => {
+    try {
+      const result = await facebookAuth.handleCallback(query);
+
+      return {
+        success: true,
+        provider: result.provider,
+        user: result.user,
+        tokens: {
+          accessToken: result.tokens.accessToken,
+          tokenType: result.tokens.tokenType,
+          // Don't expose refresh tokens in real apps
+        },
+      };
+    } catch (error) {
+      console.error("Facebook OAuth error:", error);
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  })
+
   // Health check endpoint
   .get("/health", () => ({ status: "ok", timestamp: new Date().toISOString() }))
 
@@ -122,3 +161,5 @@ console.log("- GITHUB_CLIENT_ID");
 console.log("- GITHUB_CLIENT_SECRET");
 console.log("- GOOGLE_CLIENT_ID");
 console.log("- GOOGLE_CLIENT_SECRET");
+console.log("- FACEBOOK_CLIENT_ID");
+console.log("- FACEBOOK_CLIENT_SECRET");

@@ -1,10 +1,11 @@
 import { GitHubAuth } from "./modules/github";
 import { GoogleAuth } from "./modules/google";
 import { AppleAuth } from "./modules/apple";
+import { FacebookAuth } from "./modules/facebook";
 import type { SocialAuthConfig, SocialProvider, AppleAuthConfig } from "./types";
 
 export class SocialAuth {
-  private provider: GitHubAuth | GoogleAuth | AppleAuth;
+  private provider: GitHubAuth | GoogleAuth | AppleAuth | FacebookAuth;
 
   constructor(config: SocialAuthConfig | (AppleAuthConfig & { provider: "apple" })) {
     switch (config.provider) {
@@ -16,6 +17,9 @@ export class SocialAuth {
         break;
       case "apple":
         this.provider = new AppleAuth(config as AppleAuthConfig);
+        break;
+      case "facebook":
+        this.provider = new FacebookAuth(config as SocialAuthConfig);
         break;
       default:
         throw new Error(`Unsupported provider: ${(config as any).provider}`);
@@ -53,6 +57,16 @@ export class SocialAuth {
     redirectUri: string;
   }) {
     return new AppleAuth(config);
+  }
+
+  /**
+   * Create a SocialAuth instance for Facebook
+   */
+  static createFacebook(config: { providerId: string; providerSecret: string; redirectUri: string }) {
+    return new SocialAuth({
+      provider: "facebook",
+      ...config,
+    });
   }
 
   /**

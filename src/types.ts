@@ -1,4 +1,4 @@
-export type SocialProvider = "google" | "github" | "apple";
+export type SocialProvider = "google" | "github" | "apple" | "facebook";
 
 export interface SocialAuthConfig {
   provider: SocialProvider;
@@ -22,6 +22,8 @@ export interface SocialAuthResult {
     email?: string;
     name?: string;
     picture?: string;
+    firstName?: string;
+    lastName?: string;
     [key: string]: any;
   };
   tokens: {

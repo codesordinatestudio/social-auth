@@ -1,11 +1,11 @@
 # @codesordinatestudio/social-auth
 
-A configurable social authentication package for GitHub, Google, and Apple OAuth that works with both Bun and Node.js backends.
+A configurable social authentication package for GitHub, Google, Apple, and Facebook OAuth that works with both Bun and Node.js backends.
 
 ## Features
 
 - ✅ **Framework Agnostic**: Works with any Bun or Node.js backend (Express, Fastify, Elysia, Hono, etc.)
-- ✅ **Multiple Providers**: Support for GitHub, Google, and Apple OAuth
+- ✅ **Multiple Providers**: Support for GitHub, Google, Apple, and Facebook OAuth
 - ✅ **TypeScript**: Full TypeScript support with comprehensive type definitions
 - ✅ **Configurable**: Easy configuration for different environments
 - ✅ **Modern**: Built with modern JavaScript/TypeScript standards
@@ -56,7 +56,7 @@ console.log(result.tokens); // Access tokens
 ### Using Individual Providers
 
 ```typescript
-import { GitHubAuth, GoogleAuth, AppleAuth } from "@codesordinatestudio/social-auth";
+import { GitHubAuth, GoogleAuth, AppleAuth, FacebookAuth } from "@codesordinatestudio/social-auth";
 
 // GitHub
 const github = new GitHubAuth({
@@ -79,6 +79,13 @@ const apple = new AppleAuth({
   keyId: "your-apple-key-id",
   privateKey: "your-apple-private-key-content", // or path to .p8 file
   redirectUri: "http://localhost:3000/auth/callback/apple",
+});
+
+// Facebook
+const facebook = new FacebookAuth({
+  providerId: "your-facebook-app-id",
+  providerSecret: "your-facebook-app-secret",
+  redirectUri: "http://localhost:3000/auth/callback/facebook",
 });
 ```
 
@@ -199,6 +206,42 @@ app.post("/auth/callback/apple", async (req, res) => {
 });
 ```
 
+### Facebook Example
+
+```typescript
+import express from "express";
+import { SocialAuth } from "@codesordinatestudio/social-auth";
+
+const app = express();
+
+const facebookAuth = SocialAuth.createFacebook({
+  providerId: process.env.FACEBOOK_APP_ID!,
+  providerSecret: process.env.FACEBOOK_APP_SECRET!,
+  redirectUri: "http://localhost:3000/auth/callback/facebook",
+});
+
+app.get("/auth/facebook", (req, res) => {
+  const authUrl = facebookAuth.getAuthUrl({
+    scopes: ["email", "public_profile"],
+    state: "random-state-string",
+  });
+  res.redirect(authUrl);
+});
+
+app.get("/auth/callback/facebook", async (req, res) => {
+  try {
+    const result = await facebookAuth.handleCallback(req.query);
+    res.json({
+      success: true,
+      user: result.user,
+      tokens: result.tokens,
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+```
+
 ## API Reference
 
 ### SocialAuth Class
@@ -208,6 +251,7 @@ app.post("/auth/callback/apple", async (req, res) => {
 - `SocialAuth.createGitHub(config)` - Create GitHub OAuth instance
 - `SocialAuth.createGoogle(config)` - Create Google OAuth instance
 - `SocialAuth.createApple(config)` - Create Apple OAuth instance
+- `SocialAuth.createFacebook(config)` - Create Facebook OAuth instance
 
 #### Instance Methods
 
@@ -220,7 +264,7 @@ app.post("/auth/callback/apple", async (req, res) => {
 
 ```typescript
 interface SocialAuthConfig {
-  provider: "google" | "github" | "apple";
+  provider: "google" | "github" | "apple" | "facebook";
   providerId: string; // Client ID from OAuth provider
   providerSecret: string; // Client Secret from OAuth provider
   redirectUri: string; // Your callback URL
@@ -231,12 +275,14 @@ interface SocialAuthConfig {
 
 ```typescript
 interface SocialAuthResult {
-  provider: "google" | "github" | "apple";
+  provider: "google" | "github" | "apple" | "facebook";
   user: {
     id?: string;
     email?: string;
     name?: string;
     picture?: string;
+    firstName?: string;
+    lastName?: string;
     [key: string]: any; // Provider-specific fields
   };
   tokens: {
@@ -293,6 +339,16 @@ interface SocialAuthResult {
 - Apple only provides user information (name, email) on the first authorization
 - Subsequent authorizations only return the user ID
 
+### Facebook Login Setup
+
+1. Go to [Facebook Developers](https://developers.facebook.com/)
+2. Create a new App or select an existing one
+3. Add the Facebook Login product to your app
+4. Configure your OAuth settings in App Settings > Basic
+5. Add your domains to App Domains
+6. Add your redirect URI to Valid OAuth Redirect URIs under Facebook Login settings
+7. Copy the App ID and App Secret for configuration
+
 ## Environment Variables
 
 ```env
@@ -309,6 +365,10 @@ APPLE_CLIENT_ID=your_apple_service_id
 APPLE_TEAM_ID=your_apple_team_id
 APPLE_KEY_ID=your_apple_key_id
 APPLE_PRIVATE_KEY=/path/to/your/apple/private/key.p8
+
+# Facebook
+FACEBOOK_APP_ID=your_facebook_app_id
+FACEBOOK_APP_SECRET=your_facebook_app_secret
 ```
 
 ## Error Handling

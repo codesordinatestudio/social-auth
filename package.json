@@ -1,17 +1,17 @@
 {
   "name": "@codesordinatestudio/social_auth",
-  "version": "1.0.0",
-  "description": "A configurable social authentication package for GitHub, Google, and Apple OAuth",
+  "version": "1.0.3",
+  "description": "A configurable social authentication package for GitHub, Google, Apple, and Facebook OAuth",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.cjs",
   "types": "dist/index.d.ts",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/codesordinatestudio"
+    "registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/codesordinatestudio/social-auth"
+    "url": "git+https://github.com/codesordinatestudio/social-auth.git"
   },
   "scripts": {
     "build": "tsup",
@@ -27,6 +27,7 @@
     "github",
     "google",
     "apple",
+    "facebook",
     "authentication",
     "bun",
     "nodejs"
@@ -37,6 +38,7 @@
     "@octokit/oauth-app": "^8.0.1",
     "@octokit/rest": "^22.0.0",
     "@types/jsonwebtoken": "^9.0.9",
+    "facebook-nodejs-business-sdk": "^22.0.3",
     "googleapis": "^149.0.0",
     "jsonwebtoken": "^9.0.2"
   },
@@ -44,9 +46,6 @@
     "@types/bun": "latest",
     "tsup": "^8.5.0",
     "typescript": "^5.0.0"
-  },
-  "peerDependencies": {
-    "bun": ">=1.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
