@@ -1,6 +1,6 @@
 {
   "name": "@codesordinatestudio/social_auth",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A configurable social authentication package for GitHub, Google, Apple, and Facebook OAuth",
   "type": "module",
   "main": "dist/index.cjs",

@@ -135,7 +135,10 @@ const googleAuth = SocialAuth.createGoogle({
 });
 
 app.get("/auth/google", (req, res) => {
-  const authUrl = googleAuth.getAuthUrl();
+  const authUrl = googleAuth.getAuthUrl({
+    scopes: ["openid", "profile", "email"],
+    forceAccountPicker: true, // Forces account selection
+  });
   res.redirect(authUrl);
 });
 
@@ -224,6 +227,8 @@ app.get("/auth/facebook", (req, res) => {
   const authUrl = facebookAuth.getAuthUrl({
     scopes: ["email", "public_profile"],
     state: "random-state-string",
+    forceAccountPicker: true, // Forces account picker, prevents caching
+    display: "popup", // Optional: popup, page, touch, wap
   });
   res.redirect(authUrl);
 });

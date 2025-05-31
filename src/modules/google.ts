@@ -13,13 +13,26 @@ export class GoogleAuth extends BaseSocialAuth {
   getAuthUrl(options: AuthUrlOptions = {}): string {
     const scopes = options.scopes || ["openid", "profile", "email"];
 
-    return this.oauth2Client.generateAuthUrl({
+    const authUrlOptions: any = {
       access_type: "offline",
       scope: scopes,
       include_granted_scopes: true,
       state: options.state,
-      ...options,
+    };
+
+    // Force account picker and prevent caching
+    if (options.forceAccountPicker !== false) {
+      authUrlOptions.prompt = "select_account"; // Forces account selection
+    }
+
+    // Add any additional options passed in
+    Object.keys(options).forEach(key => {
+      if (!['scopes', 'state', 'forceAccountPicker'].includes(key)) {
+        authUrlOptions[key] = options[key];
+      }
     });
+
+    return this.oauth2Client.generateAuthUrl(authUrlOptions);
   }
 
   async handleCallback(params: CallbackParams): Promise<SocialAuthResult> {

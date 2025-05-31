@@ -89,6 +89,7 @@ app
     const authUrl = googleAuth.getAuthUrl({
       scopes: ["openid", "profile", "email"],
       state: "random-state-string",
+      forceAccountPicker: true, // Forces account selection
     });
     return Response.redirect(authUrl);
   })
@@ -122,6 +123,8 @@ app
     const authUrl = facebookAuth.getAuthUrl({
       scopes: ["email", "public_profile"],
       state: "random-state-string",
+      forceAccountPicker: true, // Forces account picker, prevents caching
+      display: "popup", // Optional: popup, page, touch, wap
     });
     return Response.redirect(authUrl);
   })

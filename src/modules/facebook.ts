@@ -5,7 +5,6 @@ export class FacebookAuth extends BaseSocialAuth {
   constructor(config: Omit<SocialAuthConfig, "provider">) {
     super({ ...config, provider: "facebook" });
   }
-
   getAuthUrl(options: AuthUrlOptions = {}): string {
     const scopes = options.scopes || ["email", "public_profile"];
     const state = options.state || this._generateState();
@@ -17,6 +16,16 @@ export class FacebookAuth extends BaseSocialAuth {
       scope: scopes.join(","),
       response_type: "code",
     });
+
+    // Force account picker and prevent caching
+    if (options.forceAccountPicker !== false) {
+      queryParams.set("auth_type", "rerequest"); // Forces re-authentication
+    }
+
+    // Additional options for controlling the login flow
+    if (options.display) {
+      queryParams.set("display", options.display); // popup, page, touch, wap
+    }
 
     return `https://www.facebook.com/v17.0/dialog/oauth?${queryParams.toString()}`;
   }

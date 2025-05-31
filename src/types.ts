@@ -39,6 +39,12 @@ export interface SocialAuthResult {
 export interface AuthUrlOptions {
   scopes?: string[];
   state?: string;
+  // Common option for forcing account picker
+  forceAccountPicker?: boolean; // Default: true (forces account selection)
+  // Facebook-specific options
+  display?: "popup" | "page" | "touch" | "wap"; // Display mode for Facebook
+  // Google-specific options
+  prompt?: "none" | "consent" | "select_account"; // Google prompt parameter
   [key: string]: any;
 }
 
