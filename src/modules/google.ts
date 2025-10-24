@@ -26,8 +26,8 @@ export class GoogleAuth extends BaseSocialAuth {
     }
 
     // Add any additional options passed in
-    Object.keys(options).forEach(key => {
-      if (!['scopes', 'state', 'forceAccountPicker'].includes(key)) {
+    Object.keys(options).forEach((key) => {
+      if (!["scopes", "state", "forceAccountPicker"].includes(key)) {
         authUrlOptions[key] = options[key];
       }
     });
