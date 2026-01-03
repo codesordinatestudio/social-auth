@@ -22,6 +22,14 @@ const facebookAuth = SocialAuth.createFacebook({
   redirectUri: "http://localhost:3000/auth/callback/facebook",
 });
 
+const appleAuth = SocialAuth.createApple({
+  providerId: process.env.APPLE_CLIENT_ID!,
+  teamId: process.env.APPLE_TEAM_ID!,
+  keyId: process.env.APPLE_KEY_ID!,
+  privateKey: process.env.APPLE_PRIVATE_KEY!, // Can be file path or key content
+  redirectUri: "http://localhost:3000/auth/callback/apple",
+});
+
 app
   // Root route with login options
   .get("/", () => {
@@ -43,6 +51,7 @@ app
         <a href="/auth/github" class="auth-button">Login with GitHub</a>
         <a href="/auth/google" class="auth-button">Login with Google</a>
         <a href="/auth/facebook" class="auth-button">Login with Facebook</a>
+        <a href="/auth/apple" class="auth-button">Login with Apple</a>
       </body>
       </html>
     `,
@@ -77,7 +86,7 @@ app
       };
     } catch (error) {
       console.error("GitHub OAuth error:", error);
-      return new Response(JSON.stringify({ error: error.message }), {
+      return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
@@ -111,7 +120,7 @@ app
       };
     } catch (error) {
       console.error("Google OAuth error:", error);
-      return new Response(JSON.stringify({ error: error.message }), {
+      return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
@@ -145,7 +154,49 @@ app
       };
     } catch (error) {
       console.error("Facebook OAuth error:", error);
-      return new Response(JSON.stringify({ error: error.message }), {
+      return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  })
+
+  // Apple OAuth routes
+  .get("/auth/apple", () => {
+    const authUrl = appleAuth.getAuthUrl({
+      scopes: ["name", "email"],
+      state: "random-state-string",
+    });
+    return Response.redirect(authUrl);
+  })
+
+  .post("/auth/callback/apple", async ({ request }) => {
+    try {
+      // Parse Apple's form_post body
+      const formData = await request.formData();
+      const params: Record<string, string> = {};
+
+      for (const [key, value] of formData.entries()) {
+        params[key] = String(value);
+      }
+
+      console.log("Apple callback params:", params);
+
+      const result = await appleAuth.handleCallback(params);
+
+      return {
+        success: true,
+        provider: result.provider,
+        user: result.user,
+        tokens: {
+          accessToken: result.tokens.accessToken,
+          tokenType: result.tokens.tokenType,
+          idToken: result.tokens.idToken,
+        },
+      };
+    } catch (error) {
+      console.error("Apple OAuth error:", error);
+      return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
@@ -166,3 +217,7 @@ console.log("- GOOGLE_CLIENT_ID");
 console.log("- GOOGLE_CLIENT_SECRET");
 console.log("- FACEBOOK_CLIENT_ID");
 console.log("- FACEBOOK_CLIENT_SECRET");
+console.log("- APPLE_CLIENT_ID");
+console.log("- APPLE_TEAM_ID");
+console.log("- APPLE_KEY_ID");
+console.log("- APPLE_PRIVATE_KEY (path to .p8 file or key content)");
