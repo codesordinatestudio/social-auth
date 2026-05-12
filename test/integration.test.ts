@@ -79,6 +79,63 @@ describe("Social Auth Integration Tests", () => {
     });
   });
 
+  describe("Facebook OAuth Flow", () => {
+    it("should generate correct authorization URL", () => {
+      const facebookAuth = SocialAuth.createFacebook({
+        providerId: "facebook-app-id",
+        providerSecret: "facebook-app-secret",
+        redirectUri: "http://localhost:3000/auth/callback/facebook",
+      });
+
+      const authUrl = facebookAuth.getAuthUrl({
+        scopes: ["email", "public_profile"],
+        state: "facebook-state",
+        display: "popup",
+      });
+
+      expect(authUrl).toContain("www.facebook.com/v17.0/dialog/oauth");
+      expect(authUrl).toContain("client_id=facebook-app-id");
+      expect(authUrl).toContain("scope=email%2Cpublic_profile");
+      expect(authUrl).toContain("state=facebook-state");
+      expect(authUrl).toContain("auth_type=rerequest");
+      expect(authUrl).toContain("display=popup");
+    });
+  });
+
+  describe("Microsoft OAuth Flow", () => {
+    it("should generate correct authorization URL", () => {
+      const microsoftAuth = SocialAuth.createMicrosoft({
+        providerId: "microsoft-client-id",
+        providerSecret: "microsoft-client-secret",
+        redirectUri: "http://localhost:3000/auth/callback/microsoft",
+      });
+
+      const authUrl = microsoftAuth.getAuthUrl({
+        scopes: ["openid", "profile", "email", "User.Read"],
+        state: "microsoft-state",
+      });
+
+      expect(authUrl).toContain("login.microsoftonline.com/common/oauth2/v2.0/authorize");
+      expect(authUrl).toContain("client_id=microsoft-client-id");
+      expect(authUrl).toContain("scope=openid+profile+email+User.Read");
+      expect(authUrl).toContain("state=microsoft-state");
+      expect(authUrl).toContain("prompt=select_account");
+    });
+
+    it("should support custom tenant IDs", () => {
+      const microsoftAuth = SocialAuth.createMicrosoft({
+        providerId: "microsoft-client-id",
+        providerSecret: "microsoft-client-secret",
+        redirectUri: "http://localhost:3000/auth/callback/microsoft",
+        tenantId: "organizations",
+      });
+
+      const authUrl = microsoftAuth.getAuthUrl();
+
+      expect(authUrl).toContain("login.microsoftonline.com/organizations/oauth2/v2.0/authorize");
+    });
+  });
+
   describe("Configuration Validation", () => {
     it("should throw error for missing GitHub configuration", () => {
       expect(() => {
@@ -107,6 +164,26 @@ describe("Social Auth Integration Tests", () => {
           teamId: "team",
           keyId: "key",
           privateKey: "key",
+          redirectUri: "http://localhost:3000/callback",
+        });
+      }).toThrow();
+    });
+
+    it("should throw error for missing Facebook configuration", () => {
+      expect(() => {
+        SocialAuth.createFacebook({
+          providerId: "",
+          providerSecret: "secret",
+          redirectUri: "http://localhost:3000/callback",
+        });
+      }).toThrow();
+    });
+
+    it("should throw error for missing Microsoft configuration", () => {
+      expect(() => {
+        SocialAuth.createMicrosoft({
+          providerId: "",
+          providerSecret: "secret",
           redirectUri: "http://localhost:3000/callback",
         });
       }).toThrow();

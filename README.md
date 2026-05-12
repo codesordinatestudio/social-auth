@@ -1,11 +1,11 @@
 # @codesordinatestudio/social-auth
 
-A configurable social authentication package for GitHub, Google, Apple, and Facebook OAuth that works with both Bun and Node.js backends.
+A configurable social authentication package for GitHub, Google, Apple, Facebook, and Microsoft OAuth that works with both Bun and Node.js backends.
 
 ## Features
 
 - ✅ **Framework Agnostic**: Works with any Bun or Node.js backend (Express, Fastify, Elysia, Hono, etc.)
-- ✅ **Multiple Providers**: Support for GitHub, Google, Apple, and Facebook OAuth
+- ✅ **Multiple Providers**: Support for GitHub, Google, Apple, Facebook, and Microsoft OAuth
 - ✅ **TypeScript**: Full TypeScript support with comprehensive type definitions
 - ✅ **Configurable**: Easy configuration for different environments
 - ✅ **Modern**: Built with modern JavaScript/TypeScript standards
@@ -56,7 +56,7 @@ console.log(result.tokens); // Access tokens
 ### Using Individual Providers
 
 ```typescript
-import { GitHubAuth, GoogleAuth, AppleAuth, FacebookAuth } from "@codesordinatestudio/social-auth";
+import { GitHubAuth, GoogleAuth, AppleAuth, FacebookAuth, MicrosoftAuth } from "@codesordinatestudio/social-auth";
 
 // GitHub
 const github = new GitHubAuth({
@@ -86,6 +86,14 @@ const facebook = new FacebookAuth({
   providerId: "your-facebook-app-id",
   providerSecret: "your-facebook-app-secret",
   redirectUri: "http://localhost:3000/auth/callback/facebook",
+});
+
+// Microsoft
+const microsoft = new MicrosoftAuth({
+  providerId: "your-microsoft-client-id",
+  providerSecret: "your-microsoft-client-secret",
+  redirectUri: "http://localhost:3000/auth/callback/microsoft",
+  tenantId: "common", // optional: common, organizations, consumers, or a tenant GUID
 });
 ```
 
@@ -257,6 +265,7 @@ app.get("/auth/callback/facebook", async (req, res) => {
 - `SocialAuth.createGoogle(config)` - Create Google OAuth instance
 - `SocialAuth.createApple(config)` - Create Apple OAuth instance
 - `SocialAuth.createFacebook(config)` - Create Facebook OAuth instance
+- `SocialAuth.createMicrosoft(config)` - Create Microsoft OAuth instance
 
 #### Instance Methods
 

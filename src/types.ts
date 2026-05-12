@@ -1,4 +1,4 @@
-export type SocialProvider = "google" | "github" | "apple" | "facebook";
+export type SocialProvider = "google" | "github" | "apple" | "facebook" | "microsoft";
 
 export interface SocialAuthConfig {
   provider: SocialProvider;
@@ -13,6 +13,13 @@ export interface AppleAuthConfig {
   teamId: string;
   keyId: string;
   privateKey: string; // The actual private key content or path to .p8 file
+}
+
+export interface MicrosoftAuthConfig {
+  providerId: string;
+  providerSecret: string;
+  redirectUri: string;
+  tenantId?: string;
 }
 
 export interface SocialAuthResult {

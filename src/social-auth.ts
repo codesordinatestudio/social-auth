@@ -2,12 +2,18 @@ import { GitHubAuth } from "./modules/github";
 import { GoogleAuth } from "./modules/google";
 import { AppleAuth } from "./modules/apple";
 import { FacebookAuth } from "./modules/facebook";
-import type { SocialAuthConfig, SocialProvider, AppleAuthConfig } from "./types";
+import { MicrosoftAuth } from "./modules/microsoft";
+import type { SocialAuthConfig, SocialProvider, AppleAuthConfig, MicrosoftAuthConfig } from "./types";
 
 export class SocialAuth {
-  private provider: GitHubAuth | GoogleAuth | AppleAuth | FacebookAuth;
+  private provider: GitHubAuth | GoogleAuth | AppleAuth | FacebookAuth | MicrosoftAuth;
 
-  constructor(config: SocialAuthConfig | (AppleAuthConfig & { provider: "apple" })) {
+  constructor(
+    config:
+      | SocialAuthConfig
+      | (AppleAuthConfig & { provider: "apple" })
+      | (MicrosoftAuthConfig & { provider: "microsoft" })
+  ) {
     switch (config.provider) {
       case "github":
         this.provider = new GitHubAuth(config as SocialAuthConfig);
@@ -20,6 +26,9 @@ export class SocialAuth {
         break;
       case "facebook":
         this.provider = new FacebookAuth(config as SocialAuthConfig);
+        break;
+      case "microsoft":
+        this.provider = new MicrosoftAuth(config as MicrosoftAuthConfig);
         break;
       default:
         throw new Error(`Unsupported provider: ${(config as any).provider}`);
@@ -65,6 +74,21 @@ export class SocialAuth {
   static createFacebook(config: { providerId: string; providerSecret: string; redirectUri: string }) {
     return new SocialAuth({
       provider: "facebook",
+      ...config,
+    });
+  }
+
+  /**
+   * Create a SocialAuth instance for Microsoft
+   */
+  static createMicrosoft(config: {
+    providerId: string;
+    providerSecret: string;
+    redirectUri: string;
+    tenantId?: string;
+  }) {
+    return new SocialAuth({
+      provider: "microsoft",
       ...config,
     });
   }
